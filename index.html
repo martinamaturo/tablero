@@ -104,43 +104,8 @@
     </div>
 
     <script>
-        const MASTER_DB = [
-            { ticker: 'ADP', exchange: 'NASDAQ', fullName: 'Automatic Data Processing', operability: 'CEDEAR', risk: 'Moderado', type: 'Continuación', status: 'HOLD', techInfo: 'Rebote en directriz alcista validado por fuerte volumen horizontal en nodo de precio actual.' },
-            { ticker: 'ALAB', exchange: 'NASDAQ', fullName: 'Astera Labs Inc.', operability: 'Activo USA', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Ruptura de canal bajista. POC situado muy por debajo, indicando escasa resistencia superior.' },
-            { ticker: 'AMAT', exchange: 'NASDAQ', fullName: 'Applied Materials', operability: 'CEDEAR', risk: 'Moderado', type: 'Evaluación', status: 'WARNING', techInfo: 'Divergencia bajista en osciladores. Precio alejándose peligrosamente del POC trimestral.' },
-            { ticker: 'ANET', exchange: 'NYSE', fullName: 'Arista Networks', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Compresión en bandas de Bollinger interactuando con el área de mayor volumen tranzado.' },
-            { ticker: 'CME', exchange: 'NASDAQ', fullName: 'CME Group Inc.', operability: 'Activo USA', risk: 'Bajo', type: 'Continuación', status: 'HOLD', techInfo: 'Consolidación lateral plana. Acumulación clara sobre el Point of Control (POC).' },
-            { ticker: 'MRVL', exchange: 'NASDAQ', fullName: 'Marvell Technology', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'SELL', techInfo: 'Pérdida agresiva de la SMA 50. Perfil de volumen muestra vacío de liquidez abajo.' },
-            { ticker: 'MU', exchange: 'NASDAQ', fullName: 'Micron Technology', operability: 'CEDEAR', risk: 'Alto', type: 'Continuación', status: 'HOLD', techInfo: 'Absorción de ventas post-earnings directamente sobre el POC mensual. Estructura sana.' },
-            { ticker: 'SNDK', exchange: 'NASDAQ', fullName: 'SanDisk (Western Digital)', operability: 'Activo USA', risk: 'Alto', type: 'Reversión', status: 'SELL', techInfo: 'Muerte inminente en cruce de medias. Ruptura bajista del principal nodo de volumen.' },
-            { ticker: 'WDC', exchange: 'NASDAQ', fullName: 'Western Digital Corp.', operability: 'CEDEAR', risk: 'Moderado', type: 'Evaluación', status: 'WARNING', techInfo: 'Rechazo en resistencia dinámica y pérdida de soporte de volumen lateral clave.' },
-            { ticker: 'XBCI', exchange: 'NASDAQ', fullName: 'XBCI ETF', operability: 'Activo USA', risk: 'Alto', type: 'Evaluación', status: 'WARNING', techInfo: 'Doble techo. Ausencia de volumen comprador en el retroceso para sostener el nivel.' },
-            { ticker: 'ROKU', exchange: 'NASDAQ', fullName: 'Roku Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Rotura de POC semanal con fuerte gap de escape y entrada masiva de flujo de caja.' },
-            { ticker: 'DDOG', exchange: 'NASDAQ', fullName: 'Datadog Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Falso quiebre bajista (Bear Trap) reabsorbido rápidamente con incremento de volumen.' },
-            { ticker: 'TSLA', exchange: 'NASDAQ', fullName: 'Tesla Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Doble suelo confirmado apoyado milimétricamente en el principal nodo de volumen anual.' },
-            { ticker: 'NVDA', exchange: 'NASDAQ', fullName: 'NVIDIA Corp.', operability: 'CEDEAR', risk: 'Moderado', type: 'Aceleración', status: 'BUY', techInfo: 'Vela envolvente rompiendo resistencia sin resistencia de volumen horizontal a la vista.' },
-            { ticker: 'CRWD', exchange: 'NASDAQ', fullName: 'CrowdStrike', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Secado extremo de volumen en consolidación lateral. El POC actúa como trampolín.' },
-            { ticker: 'MELI', exchange: 'NASDAQ', fullName: 'MercadoLibre', operability: 'CEDEAR', risk: 'Moderado', type: 'Continuación', status: 'BUY', techInfo: 'Throwback a zona de consolidación previa. Soporte validado por perfil de volumen alto.' },
-            { ticker: 'PLTR', exchange: 'NYSE', fullName: 'Palantir Tech', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'ATH con gap. Traslado alcista del POC indicando aceptación de precios más altos.' },
-            { ticker: 'AAPL', exchange: 'NASDAQ', fullName: 'Apple Inc.', operability: 'CEDEAR', risk: 'Bajo', type: 'Reversión', status: 'HOLD', techInfo: 'Recuperando directriz sobre la base del área de valor. MACD perdiendo momentum bajista.' },
-            { ticker: 'MSFT', exchange: 'NASDAQ', fullName: 'Microsoft Corp.', operability: 'CEDEAR', risk: 'Bajo', type: 'Continuación', status: 'BUY', techInfo: 'Apoyo sobre la EMA 20 y el POC. Confirmación de estructura de continuación.' },
-            { ticker: 'META', exchange: 'NASDAQ', fullName: 'Meta Platforms', operability: 'CEDEAR', risk: 'Moderado', type: 'Aceleración', status: 'BUY', techInfo: 'Ruptura de cuña. El volumen lateral avala el quiebre con agresividad compradora.' },
-            { ticker: 'AMZN', exchange: 'NASDAQ', fullName: 'Amazon.com', operability: 'CEDEAR', risk: 'Moderado', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Generando nuevo POC superior antes del breakout de caja de Darvas.' },
-            { ticker: 'NFLX', exchange: 'NASDAQ', fullName: 'Netflix Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Rechazo de caída tras testear límite inferior del área de valor trimestral.' },
-            { ticker: 'GOOGL', exchange: 'NASDAQ', fullName: 'Alphabet Inc.', operability: 'CEDEAR', risk: 'Bajo', type: 'Continuación', status: 'HOLD', techInfo: 'Acumulación institucional clara centrada en el POC histórico.' },
-            { ticker: 'AMD', exchange: 'NASDAQ', fullName: 'Advanced Micro Devices', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Sobrevendida en RSI. Fuerte barrera de volumen horizontal frenando la corrección.' },
-            { ticker: 'INTC', exchange: 'NASDAQ', fullName: 'Intel Corp.', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Divergencia alcista de momentum mientras descansa en el POC histórico inferior.' },
-            { ticker: 'SNOW', exchange: 'NYSE', fullName: 'Snowflake Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Vela marubozu alcista con el mayor volumen de los últimos 3 meses rompiendo resistencia.' },
-            { ticker: 'NET', exchange: 'NYSE', fullName: 'Cloudflare Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Suelo redondeado validado por migración gradual del volumen hacia la parte superior.' },
-            { ticker: 'PYPL', exchange: 'NASDAQ', fullName: 'PayPal Holdings', operability: 'CEDEAR', risk: 'Moderado', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Base amplia consolidada. El POC ejerce atracción magnética hacia el alza.' },
-            { ticker: 'SQ', exchange: 'NYSE', fullName: 'Block Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Cambio de polaridad técnica. Antigua resistencia de volumen ahora actúa como soporte.' },
-            { ticker: 'ZM', exchange: 'NASDAQ', fullName: 'Zoom Video', operability: 'CEDEAR', risk: 'Alto', type: 'Evaluación', status: 'HOLD', techInfo: 'Construyendo hombro derecho de patrón HCH invertido. POC respaldando la estructura.' },
-            { ticker: 'ARM', exchange: 'NASDAQ', fullName: 'Arm Holdings', operability: 'CEDEAR', risk: 'Alto', type: 'Continuación', status: 'BUY', techInfo: 'Rebote en la banda inferior de Bollinger coincidiendo con el pico de volumen de sesión.' },
-            { ticker: 'SMCI', exchange: 'NASDAQ', fullName: 'Super Micro Computer', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Fase parabólica activada. Sin niveles históricos de POC que frenen el avance.' },
-            { ticker: 'HOOD', exchange: 'NASDAQ', fullName: 'Robinhood Markets', operability: 'Lemon', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Mínima volatilidad histórica. Compresión masiva en nodo de volumen; inminente expansión.' },
-            { ticker: 'COIN', exchange: 'NASDAQ', fullName: 'Coinbase Global', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Rebote en SMA 200 diaria. El perfil de volumen demuestra fuerte defensa institucional aquí.' }
-        ];
-
+        let MASTER_DB = []; // Ahora arranca vacío y se llena con el JSON
+        
         let favorites = JSON.parse(localStorage.getItem('dashboard_favoritos_v3')) || [];
         let defaultCartera = ['ADP', 'ALAB', 'AMAT', 'ANET', 'MRVL', 'MU', 'SNDK', 'CME', 'WDC', 'XBCI'];
         let portfolio = JSON.parse(localStorage.getItem('dashboard_portfolio_v3')) || defaultCartera;
@@ -249,7 +214,7 @@
             } else if (tabName === 'favoritos') {
                 dataToRender = MASTER_DB.filter(item => favorites.includes(item.ticker));
                 sectionTitle.textContent = 'Viendo: Mis Favoritos';
-                if(dataToRender.length === 0) {
+                if(dataToRender.length === 0 && MASTER_DB.length > 0) {
                     grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium bg-[#121b2b] rounded-xl border border-slate-800 border-dashed">No tienes activos marcados como favoritos.</div>`;
                     return;
                 }
@@ -260,7 +225,6 @@
 
             dataToRender.forEach(item => grid.appendChild(createCard(item)));
 
-            // Event Listeners Dinámicos
             document.querySelectorAll('.fav-star').forEach(star => {
                 star.addEventListener('click', (e) => {
                     toggleStorage(favorites, e.currentTarget.dataset.ticker, 'dashboard_favoritos_v3');
@@ -330,8 +294,27 @@
         document.getElementById('close-modal').addEventListener('click', () => {
             modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = 'auto'; modalChartContainer.innerHTML = ''; 
         });
-        
-        renderGrid('scanners');
-    </script>
+
+        // NUEVO: Función para cargar los datos dinámicamente desde el archivo generado por Python
+        async function inicializarDashboard() {
+            try {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 font-medium">Cargando escáneres del mercado...</div>`;
+                const response = await fetch('data.json');
+                if (!response.ok) throw new Error('No se pudo leer data.json');
+                
+                MASTER_DB = await response.json();
+                renderGrid('scanners');
+            } catch (error) {
+                console.error("Error al cargar los datos:", error);
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-rose-400 font-medium bg-[#121b2b] rounded-xl border border-rose-800/50">
+                        Esperando primera ejecución del motor Python.<br>Asegurate de que <b>data.json</b> esté en el repositorio.
+                    </div>`;
+            }
+        }
+
+        inicializarDashboard();
+   </script>
+    
 </body>
 </html>
