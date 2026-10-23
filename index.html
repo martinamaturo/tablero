@@ -8,82 +8,53 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #090f1a;
-            color: #e2e8f0;
-        }
-
-        /* Custom Scrollbar */
+        body { font-family: 'Inter', sans-serif; background-color: #090f1a; color: #e2e8f0; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-        /* Card styles */
         .glass-card {
             background: linear-gradient(145deg, #162032 0%, #0d1423 100%);
-            border: 1px solid #2a3a51;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s, border-color 0.2s;
-            position: relative;
+            border: 1px solid #2a3a51; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s, border-color 0.2s; position: relative;
         }
-        .glass-card:hover {
-            transform: translateY(-2px);
-            border-color: #3b82f6;
-        }
+        .glass-card:hover { transform: translateY(-2px); border-color: #3b82f6; }
 
-        /* Signal Colors */
         .signal-buy { color: #34d399; border-color: rgba(52, 211, 153, 0.3); background-color: rgba(52, 211, 153, 0.1); }
         .signal-sell { color: #f87171; border-color: rgba(248, 113, 113, 0.3); background-color: rgba(248, 113, 113, 0.1); }
         .signal-hold { color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); background-color: rgba(251, 191, 36, 0.1); }
         
-        /* Favorites Star */
         .fav-star { cursor: pointer; transition: all 0.2s; color: #475569; }
         .fav-star:hover { transform: scale(1.1); color: #fbbf24; }
         .fav-star.active { color: #fbbf24; filter: drop-shadow(0 0 4px rgba(251,191,36,0.6)); }
 
-        /* Tooltips */
         .tooltip-container { position: relative; }
         .tooltip-text, .ticker-tooltip {
-            visibility: hidden; opacity: 0;
-            background-color: #1e293b; color: #cbd5e1;
+            visibility: hidden; opacity: 0; background-color: #1e293b; color: #cbd5e1;
             text-align: center; border-radius: 6px; padding: 8px 12px;
-            position: absolute; z-index: 20;
-            transition: opacity 0.2s;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            border: 1px solid #475569;
+            position: absolute; z-index: 20; transition: opacity 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); border: 1px solid #475569;
         }
-        .tooltip-text {
-            bottom: 125%; left: 50%; transform: translateX(-50%);
-            width: max-content; max-width: 250px; font-size: 0.75rem;
-        }
-        .ticker-tooltip {
-            top: 100%; left: 0; margin-top: 8px;
-            width: max-content; min-width: 180px; font-size: 0.75rem; text-align: left;
-        }
-        .tooltip-container:hover .tooltip-text, .ticker-hover:hover .ticker-tooltip { 
-            visibility: visible; opacity: 1; 
-        }
-
-        /* Modal */
+        .tooltip-text { bottom: 125%; left: 50%; transform: translateX(-50%); width: max-content; max-width: 260px; font-size: 0.75rem; }
+        .ticker-tooltip { top: 100%; left: 0; margin-top: 8px; width: max-content; min-width: 180px; font-size: 0.75rem; text-align: left; }
+        .tooltip-container:hover .tooltip-text, .ticker-hover:hover .ticker-tooltip { visibility: visible; opacity: 1; }
         #chart-modal { backdrop-filter: blur(8px); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-4 md:p-6 lg:p-8">
-
     <header class="mb-8 border-b border-slate-800 pb-6">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
                 <div class="text-blue-400 text-[10px] font-bold tracking-widest uppercase mb-2 flex items-center">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse shadow-[0_0_8px_#34d399]"></span>
-                    Terminal Operativa · Análisis Diario
+                    Terminal Operativa · Análisis Diario + Perfil de Volumen
                 </div>
                 <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
                     Terminal <span class="text-blue-500">PRO</span>
                 </h1>
                 <p class="text-slate-400 text-sm max-w-3xl leading-relaxed">
-                    Identificación algorítmica sobre gráficas diarias. Pasa el cursor sobre el ticker para ver operabilidad y sobre la señal para detalles técnicos.
+                    Identificación algorítmica. Gestión activa de cartera y favoritos interactiva. Operabilidad filtrada por prioridad (CEDEAR > Activo USA > Lemon).
                 </p>
             </div>
             <div class="text-right text-xs text-slate-400 bg-[#121b2b] p-3 rounded-lg border border-[#2a3a51]">
@@ -96,7 +67,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <nav class="flex flex-wrap gap-3" id="tabs">
             <button data-target="scanners" class="tab-btn px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)] border border-blue-500">
-                Scanners (Oportunidades)
+                Scanners
             </button>
             <button data-target="cartera" class="tab-btn px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700">
                 Mi Cartera <span class="ml-2 bg-slate-900 text-slate-300 border border-slate-600 text-xs px-2 py-0.5 rounded-full" id="cartera-count">0</span>
@@ -106,7 +77,6 @@
                 Favoritos <span class="ml-2 bg-slate-900 text-amber-400 border border-amber-900/50 text-xs px-2 py-0.5 rounded-full" id="fav-count">0</span>
             </button>
         </nav>
-
         <div class="flex items-center gap-2 bg-[#121b2b] p-1.5 rounded-lg border border-slate-700">
             <span class="text-xs font-semibold text-slate-400 pl-2">Riesgo:</span>
             <select id="risk-filter" class="bg-slate-800 text-slate-200 text-sm font-bold rounded px-3 py-1.5 outline-none border border-slate-600 focus:border-blue-500 cursor-pointer">
@@ -121,50 +91,62 @@
     <div class="flex justify-between items-center mb-6 text-sm text-slate-400">
         <div id="section-title" class="font-bold text-slate-200 uppercase tracking-widest text-xs">Viendo: Scanners</div>
     </div>
-
     <main id="content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-10"></main>
 
     <div id="chart-modal" class="fixed inset-0 bg-[#040810]/95 z-50 hidden flex-col items-center justify-center p-4">
         <div class="bg-[#0f172a] border border-slate-700 rounded-xl w-full max-w-7xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="flex justify-between items-center p-4 border-b border-slate-800 bg-[#162032]">
                 <h2 id="modal-title" class="text-xl font-extrabold text-white flex items-center gap-3"></h2>
-                <button id="close-modal" class="text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-rose-600 px-4 py-2 rounded-lg font-bold text-sm border border-slate-700 hover:border-rose-500">
-                    Cerrar ✕
-                </button>
+                <button id="close-modal" class="text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-rose-600 px-4 py-2 rounded-lg font-bold text-sm border border-slate-700 hover:border-rose-500">Cerrar ✕</button>
             </div>
             <div class="flex-grow bg-[#090f1a]" id="modal-chart-container"></div>
         </div>
     </div>
 
     <script>
-        const CARTERA_DATA = [
-            { ticker: 'ADP', exchange: 'NASDAQ', fullName: 'Automatic Data Processing', operability: 'CEDEAR (BMB)', risk: 'Moderado', type: 'Continuación', status: 'HOLD', action: 'MANTENER', techInfo: 'Gráfico diario rebotando en directriz alcista con volumen estable. RSI neutro (55).' },
-            { ticker: 'ALAB', exchange: 'NASDAQ', fullName: 'Astera Labs Inc.', operability: 'Activo USA (Lemon/BMB)', risk: 'Alto', type: 'Aceleración', status: 'BUY', action: 'ACUMULAR', techInfo: 'Ruptura de canal bajista en cierre diario. MACD cruzando al alza.' },
-            { ticker: 'AMAT', exchange: 'NASDAQ', fullName: 'Applied Materials', operability: 'CEDEAR (BMB)', risk: 'Moderado', type: 'Evaluación', status: 'WARNING', action: 'ALERTA', techInfo: 'Divergencia bajista en osciladores diarios. Resistencia en techo histórico.' },
-            { ticker: 'ANET', exchange: 'NYSE', fullName: 'Arista Networks', operability: 'CEDEAR (BMB)', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', action: 'MANTENER', techInfo: 'Compresión de Bollinger Bands en timeframe diario tras rally sostenido.' },
-            { ticker: 'CME', exchange: 'NASDAQ', fullName: 'CME Group Inc.', operability: 'Activo USA (Lemon/BMB)', risk: 'Bajo', type: 'Continuación', status: 'HOLD', action: 'MANTENER', techInfo: 'Tendencia lateral diaria, apoyando sobre la EMA 50 sin perder nivel clave.' },
-            { ticker: 'MRVL', exchange: 'NASDAQ', fullName: 'Marvell Technology', operability: 'CEDEAR (BMB)', risk: 'Alto', type: 'Reversión', status: 'SELL', action: 'SALIR', techInfo: 'Cierre diario por debajo de SMA 50 con incremento notable de volumen.' },
-            { ticker: 'MU', exchange: 'NASDAQ', fullName: 'Micron Technology', operability: 'CEDEAR (BMB)', risk: 'Alto', type: 'Continuación', status: 'HOLD', action: 'MANTENER', techInfo: 'Consolidando ganancias diarias post-earnings. Soporte fuerte en zona actual de POC.' },
-            { ticker: 'SNDK', exchange: 'NASDAQ', fullName: 'SanDisk (Western Digital)', operability: 'Activo USA (Lemon)', risk: 'Alto', type: 'Reversión', status: 'SELL', action: 'SALIR', techInfo: 'Cruce bajista en medias diarias (Muerte inminente). Estructura debilitada.' },
-            { ticker: 'WDC', exchange: 'NASDAQ', fullName: 'Western Digital Corp.', operability: 'CEDEAR (BMB)', risk: 'Moderado', type: 'Evaluación', status: 'WARNING', action: 'AJUSTAR STOP', techInfo: 'Rechazo en resistencia diaria. RSI perdiendo nivel 50 a la baja.' },
-            { ticker: 'XBCI', exchange: 'NASDAQ', fullName: 'XBCI ETF', operability: 'Activo USA', risk: 'Alto', type: 'Evaluación', status: 'WARNING', action: 'AJUSTAR STOP', techInfo: 'Doble techo confirmado en gráfica diaria. Riesgo de reversión.' }
+        const MASTER_DB = [
+            { ticker: 'ADP', exchange: 'NASDAQ', fullName: 'Automatic Data Processing', operability: 'CEDEAR', risk: 'Moderado', type: 'Continuación', status: 'HOLD', techInfo: 'Rebote en directriz alcista validado por fuerte volumen horizontal en nodo de precio actual.' },
+            { ticker: 'ALAB', exchange: 'NASDAQ', fullName: 'Astera Labs Inc.', operability: 'Activo USA', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Ruptura de canal bajista. POC situado muy por debajo, indicando escasa resistencia superior.' },
+            { ticker: 'AMAT', exchange: 'NASDAQ', fullName: 'Applied Materials', operability: 'CEDEAR', risk: 'Moderado', type: 'Evaluación', status: 'WARNING', techInfo: 'Divergencia bajista en osciladores. Precio alejándose peligrosamente del POC trimestral.' },
+            { ticker: 'ANET', exchange: 'NYSE', fullName: 'Arista Networks', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Compresión en bandas de Bollinger interactuando con el área de mayor volumen tranzado.' },
+            { ticker: 'CME', exchange: 'NASDAQ', fullName: 'CME Group Inc.', operability: 'Activo USA', risk: 'Bajo', type: 'Continuación', status: 'HOLD', techInfo: 'Consolidación lateral plana. Acumulación clara sobre el Point of Control (POC).' },
+            { ticker: 'MRVL', exchange: 'NASDAQ', fullName: 'Marvell Technology', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'SELL', techInfo: 'Pérdida agresiva de la SMA 50. Perfil de volumen muestra vacío de liquidez abajo.' },
+            { ticker: 'MU', exchange: 'NASDAQ', fullName: 'Micron Technology', operability: 'CEDEAR', risk: 'Alto', type: 'Continuación', status: 'HOLD', techInfo: 'Absorción de ventas post-earnings directamente sobre el POC mensual. Estructura sana.' },
+            { ticker: 'SNDK', exchange: 'NASDAQ', fullName: 'SanDisk (Western Digital)', operability: 'Activo USA', risk: 'Alto', type: 'Reversión', status: 'SELL', techInfo: 'Muerte inminente en cruce de medias. Ruptura bajista del principal nodo de volumen.' },
+            { ticker: 'WDC', exchange: 'NASDAQ', fullName: 'Western Digital Corp.', operability: 'CEDEAR', risk: 'Moderado', type: 'Evaluación', status: 'WARNING', techInfo: 'Rechazo en resistencia dinámica y pérdida de soporte de volumen lateral clave.' },
+            { ticker: 'XBCI', exchange: 'NASDAQ', fullName: 'XBCI ETF', operability: 'Activo USA', risk: 'Alto', type: 'Evaluación', status: 'WARNING', techInfo: 'Doble techo. Ausencia de volumen comprador en el retroceso para sostener el nivel.' },
+            { ticker: 'ROKU', exchange: 'NASDAQ', fullName: 'Roku Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Rotura de POC semanal con fuerte gap de escape y entrada masiva de flujo de caja.' },
+            { ticker: 'DDOG', exchange: 'NASDAQ', fullName: 'Datadog Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Falso quiebre bajista (Bear Trap) reabsorbido rápidamente con incremento de volumen.' },
+            { ticker: 'TSLA', exchange: 'NASDAQ', fullName: 'Tesla Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Doble suelo confirmado apoyado milimétricamente en el principal nodo de volumen anual.' },
+            { ticker: 'NVDA', exchange: 'NASDAQ', fullName: 'NVIDIA Corp.', operability: 'CEDEAR', risk: 'Moderado', type: 'Aceleración', status: 'BUY', techInfo: 'Vela envolvente rompiendo resistencia sin resistencia de volumen horizontal a la vista.' },
+            { ticker: 'CRWD', exchange: 'NASDAQ', fullName: 'CrowdStrike', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Secado extremo de volumen en consolidación lateral. El POC actúa como trampolín.' },
+            { ticker: 'MELI', exchange: 'NASDAQ', fullName: 'MercadoLibre', operability: 'CEDEAR', risk: 'Moderado', type: 'Continuación', status: 'BUY', techInfo: 'Throwback a zona de consolidación previa. Soporte validado por perfil de volumen alto.' },
+            { ticker: 'PLTR', exchange: 'NYSE', fullName: 'Palantir Tech', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'ATH con gap. Traslado alcista del POC indicando aceptación de precios más altos.' },
+            { ticker: 'AAPL', exchange: 'NASDAQ', fullName: 'Apple Inc.', operability: 'CEDEAR', risk: 'Bajo', type: 'Reversión', status: 'HOLD', techInfo: 'Recuperando directriz sobre la base del área de valor. MACD perdiendo momentum bajista.' },
+            { ticker: 'MSFT', exchange: 'NASDAQ', fullName: 'Microsoft Corp.', operability: 'CEDEAR', risk: 'Bajo', type: 'Continuación', status: 'BUY', techInfo: 'Apoyo sobre la EMA 20 y el POC. Confirmación de estructura de continuación.' },
+            { ticker: 'META', exchange: 'NASDAQ', fullName: 'Meta Platforms', operability: 'CEDEAR', risk: 'Moderado', type: 'Aceleración', status: 'BUY', techInfo: 'Ruptura de cuña. El volumen lateral avala el quiebre con agresividad compradora.' },
+            { ticker: 'AMZN', exchange: 'NASDAQ', fullName: 'Amazon.com', operability: 'CEDEAR', risk: 'Moderado', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Generando nuevo POC superior antes del breakout de caja de Darvas.' },
+            { ticker: 'NFLX', exchange: 'NASDAQ', fullName: 'Netflix Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Rechazo de caída tras testear límite inferior del área de valor trimestral.' },
+            { ticker: 'GOOGL', exchange: 'NASDAQ', fullName: 'Alphabet Inc.', operability: 'CEDEAR', risk: 'Bajo', type: 'Continuación', status: 'HOLD', techInfo: 'Acumulación institucional clara centrada en el POC histórico.' },
+            { ticker: 'AMD', exchange: 'NASDAQ', fullName: 'Advanced Micro Devices', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Sobrevendida en RSI. Fuerte barrera de volumen horizontal frenando la corrección.' },
+            { ticker: 'INTC', exchange: 'NASDAQ', fullName: 'Intel Corp.', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Divergencia alcista de momentum mientras descansa en el POC histórico inferior.' },
+            { ticker: 'SNOW', exchange: 'NYSE', fullName: 'Snowflake Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Vela marubozu alcista con el mayor volumen de los últimos 3 meses rompiendo resistencia.' },
+            { ticker: 'NET', exchange: 'NYSE', fullName: 'Cloudflare Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Suelo redondeado validado por migración gradual del volumen hacia la parte superior.' },
+            { ticker: 'PYPL', exchange: 'NASDAQ', fullName: 'PayPal Holdings', operability: 'CEDEAR', risk: 'Moderado', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Base amplia consolidada. El POC ejerce atracción magnética hacia el alza.' },
+            { ticker: 'SQ', exchange: 'NYSE', fullName: 'Block Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Cambio de polaridad técnica. Antigua resistencia de volumen ahora actúa como soporte.' },
+            { ticker: 'ZM', exchange: 'NASDAQ', fullName: 'Zoom Video', operability: 'CEDEAR', risk: 'Alto', type: 'Evaluación', status: 'HOLD', techInfo: 'Construyendo hombro derecho de patrón HCH invertido. POC respaldando la estructura.' },
+            { ticker: 'ARM', exchange: 'NASDAQ', fullName: 'Arm Holdings', operability: 'CEDEAR', risk: 'Alto', type: 'Continuación', status: 'BUY', techInfo: 'Rebote en la banda inferior de Bollinger coincidiendo con el pico de volumen de sesión.' },
+            { ticker: 'SMCI', exchange: 'NASDAQ', fullName: 'Super Micro Computer', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Fase parabólica activada. Sin niveles históricos de POC que frenen el avance.' },
+            { ticker: 'HOOD', exchange: 'NASDAQ', fullName: 'Robinhood Markets', operability: 'Lemon', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Mínima volatilidad histórica. Compresión masiva en nodo de volumen; inminente expansión.' },
+            { ticker: 'COIN', exchange: 'NASDAQ', fullName: 'Coinbase Global', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Rebote en SMA 200 diaria. El perfil de volumen demuestra fuerte defensa institucional aquí.' }
         ];
 
-        const SCANNERS_DATA = [
-            { ticker: 'TSLA', exchange: 'NASDAQ', fullName: 'Tesla Inc.', operability: 'CEDEAR (BMB)', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Doble suelo confirmado en cierre diario. Divergencia alcista en MACD.' },
-            { ticker: 'NVDA', exchange: 'NASDAQ', fullName: 'NVIDIA Corp.', operability: 'CEDEAR (BMB)', risk: 'Moderado', type: 'Aceleración', status: 'BUY', techInfo: 'Vela envolvente alcista diaria rompiendo zona de consolidación.' },
-            { ticker: 'CRWD', exchange: 'NASDAQ', fullName: 'CrowdStrike', operability: 'Activo USA / CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Soporte firme en EMA 20 diaria. Secado de volumen previo a movimiento.' },
-            { ticker: 'MELI', exchange: 'NASDAQ', fullName: 'MercadoLibre', operability: 'CEDEAR (BMB)', risk: 'Moderado', type: 'Continuación', status: 'BUY', techInfo: 'Pullback diario de manual a zona de antigua resistencia sin volumen vendedor.' },
-            { ticker: 'PLTR', exchange: 'NYSE', fullName: 'Palantir Tech', operability: 'CEDEAR (BMB)', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Nuevo máximo histórico (ATH) con gap de escape mantenido al cierre.' }
-        ];
-
-        const ALL_DATA_DICT = {};
-        [...CARTERA_DATA, ...SCANNERS_DATA].forEach(item => { ALL_DATA_DICT[item.ticker] = item; });
-        CARTERA_DATA.forEach(item => { ALL_DATA_DICT[item.ticker] = item; });
-
+        let favorites = JSON.parse(localStorage.getItem('dashboard_favoritos_v3')) || [];
+        let defaultCartera = ['ADP', 'ALAB', 'AMAT', 'ANET', 'MRVL', 'MU', 'SNDK', 'CME', 'WDC', 'XBCI'];
+        let portfolio = JSON.parse(localStorage.getItem('dashboard_portfolio_v3')) || defaultCartera;
+        
         let currentTab = 'scanners';
         let currentRisk = 'Todos';
-        let favorites = JSON.parse(localStorage.getItem('dashboard_favoritos_v2')) || [];
 
         const grid = document.getElementById('content-grid');
         const tabs = document.querySelectorAll('.tab-btn');
@@ -176,60 +158,38 @@
         const modal = document.getElementById('chart-modal');
         const modalTitle = document.getElementById('modal-title');
         const modalChartContainer = document.getElementById('modal-chart-container');
-        const closeModalBtn = document.getElementById('close-modal');
 
-        carteraCountEl.textContent = CARTERA_DATA.length;
-        updateFavCount();
-
-        setInterval(() => {
-            timeDisplay.textContent = new Date().toLocaleString('es-AR', { dateStyle: 'full', timeStyle: 'medium' });
-        }, 1000);
-
-        function getStatusClasses(status) {
-            switch(status) {
-                case 'BUY': return 'signal-buy';
-                case 'HOLD': return 'signal-hold';
-                case 'WARNING': return 'signal-hold';
-                case 'SELL': return 'signal-sell';
-                default: return 'text-slate-400 border-slate-600 bg-slate-800';
-            }
+        function updateCounts() {
+            carteraCountEl.textContent = portfolio.length;
+            favCountEl.textContent = favorites.length;
         }
+        updateCounts();
 
-        function toggleFavorite(ticker) {
-            const index = favorites.indexOf(ticker);
-            if (index > -1) favorites.splice(index, 1);
-            else favorites.push(ticker);
-            
-            localStorage.setItem('dashboard_favoritos_v2', JSON.stringify(favorites));
-            updateFavCount();
-            
-            if (currentTab === 'favoritos') {
-                renderGrid(currentTab);
-            } else {
-                const star = document.querySelector(`.fav-star[data-ticker="${ticker}"]`);
-                if (star) {
-                    if(favorites.includes(ticker)) {
-                        star.classList.add('active');
-                        star.innerHTML = `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25z" clip-rule="evenodd" />`;
-                    } else {
-                        star.classList.remove('active');
-                        star.innerHTML = `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25zm0 3.32l-1.614 3.277a.75.75 0 01-.564.41l-3.616.525 2.616 2.55a.75.75 0 01.216.664l-.618 3.601 3.234-1.7a.75.75 0 01.698 0l3.234 1.7-.618-3.601a.75.75 0 01.216-.664l2.616-2.55-3.616-.525a.75.75 0 01-.564-.41L10 5.57z" clip-rule="evenodd" />`;
-                    }
-                }
-            }
+        setInterval(() => { timeDisplay.textContent = new Date().toLocaleString('es-AR', { dateStyle: 'full', timeStyle: 'medium' }); }, 1000);
+
+        function toggleStorage(array, item, key) {
+            const index = array.indexOf(item);
+            if (index > -1) array.splice(index, 1);
+            else array.push(item);
+            localStorage.setItem(key, JSON.stringify(array));
+            updateCounts();
         }
-
-        function updateFavCount() { favCountEl.textContent = favorites.length; }
 
         function createCard(item) {
-            const statusClass = getStatusClasses(item.status);
-            const actionText = item.action || (item.status === 'BUY' ? 'INGRESAR' : item.status === 'HOLD' ? 'VIGILAR' : 'SALIR');
             const isFav = favorites.includes(item.ticker);
+            const inPortfolio = portfolio.includes(item.ticker);
             const riskColor = item.risk === 'Alto' ? 'text-rose-400' : item.risk === 'Moderado' ? 'text-amber-400' : 'text-emerald-400';
             
             const starIcon = isFav 
                 ? `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25z" clip-rule="evenodd" />`
                 : `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25zm0 3.32l-1.614 3.277a.75.75 0 01-.564.41l-3.616.525 2.616 2.55a.75.75 0 01.216.664l-.618 3.601 3.234-1.7a.75.75 0 01.698 0l3.234 1.7-.618-3.601a.75.75 0 01.216-.664l2.616-2.55-3.616-.525a.75.75 0 01-.564-.41L10 5.57z" clip-rule="evenodd" />`;
+
+            const btnPortfolio = currentTab === 'cartera' 
+                ? `<button class="btn-remove-port px-2 py-0.5 ml-2 bg-rose-900/40 hover:bg-rose-600 text-rose-300 rounded border border-rose-700 transition" data-ticker="${item.ticker}" title="Quitar de mi cartera">✕</button>`
+                : (!inPortfolio ? `<button class="btn-add-port px-2 py-0.5 ml-2 bg-emerald-900/40 hover:bg-emerald-600 text-emerald-300 rounded border border-emerald-700 font-bold transition" data-ticker="${item.ticker}" title="Agregar a mi cartera">＋</button>` : '');
+
+            const statusClass = item.status === 'BUY' ? 'signal-buy' : item.status === 'SELL' ? 'signal-sell' : 'signal-hold';
+            const actionText = item.status === 'BUY' ? 'INGRESAR' : item.status === 'HOLD' ? 'VIGILAR' : item.status === 'SELL' ? 'SALIR' : 'ALERTA';
 
             const card = document.createElement('article');
             card.className = 'glass-card rounded-xl p-5 flex flex-col h-full justify-between';
@@ -247,12 +207,11 @@
                             </div>
                         </div>
                         <div class="flex flex-col items-end gap-2">
-                            <svg class="w-6 h-6 fav-star ${isFav ? 'active' : ''}" data-ticker="${item.ticker}" viewBox="0 0 20 20" fill="currentColor">
-                                ${starIcon}
-                            </svg>
-                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded bg-[#1e293b] text-slate-300 border border-[#334155]">
-                                ${item.type}
-                            </span>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 fav-star ${isFav ? 'active' : ''}" data-ticker="${item.ticker}" viewBox="0 0 20 20" fill="currentColor">${starIcon}</svg>
+                                ${btnPortfolio}
+                            </div>
+                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded bg-[#1e293b] text-slate-300 border border-[#334155]">${item.type}</span>
                         </div>
                     </div>
                     
@@ -263,15 +222,13 @@
                                 <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                             <div class="tooltip-text font-medium text-left leading-relaxed">
-                                <strong class="text-white block mb-1">Fundamento (Vela Diaria):</strong>
+                                <strong class="text-white block mb-1">Fundamento (Volumen Diario):</strong>
                                 ${item.techInfo}
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <button class="chart-btn w-full bg-[#1e293b] hover:bg-blue-600 text-slate-200 hover:text-white border border-[#334155] hover:border-blue-500 font-bold py-2.5 px-4 rounded-lg transition-all duration-200 flex justify-center items-center gap-2" 
-                        data-ticker="${item.ticker}" data-exchange="${item.exchange}">
+                <button class="chart-btn w-full bg-[#1e293b] hover:bg-blue-600 text-slate-200 hover:text-white border border-[#334155] hover:border-blue-500 font-bold py-2.5 px-4 rounded-lg transition-all duration-200 flex justify-center items-center gap-2" data-ticker="${item.ticker}" data-exchange="${item.exchange}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
                     Ver Gráfico TV
                 </button>
@@ -284,37 +241,51 @@
             let dataToRender = [];
 
             if (tabName === 'scanners') {
-                dataToRender = SCANNERS_DATA;
-                sectionTitle.textContent = 'Viendo: Oportunidades del Algoritmo';
+                dataToRender = MASTER_DB;
+                sectionTitle.textContent = 'Viendo: Escáner de Oportunidades';
             } else if (tabName === 'cartera') {
-                dataToRender = CARTERA_DATA;
-                sectionTitle.textContent = 'Viendo: Mi Cartera Actual';
+                dataToRender = MASTER_DB.filter(item => portfolio.includes(item.ticker));
+                sectionTitle.textContent = 'Viendo: Mi Cartera';
             } else if (tabName === 'favoritos') {
-                dataToRender = favorites.map(ticker => ALL_DATA_DICT[ticker]).filter(Boolean);
+                dataToRender = MASTER_DB.filter(item => favorites.includes(item.ticker));
                 sectionTitle.textContent = 'Viendo: Mis Favoritos';
                 if(dataToRender.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium bg-[#121b2b] rounded-xl border border-slate-800 border-dashed">
-                        No tienes activos marcados como favoritos. <br/>Haz clic en la estrella de cualquier tarjeta para guardarla aquí.
-                    </div>`;
+                    grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium bg-[#121b2b] rounded-xl border border-slate-800 border-dashed">No tienes activos marcados como favoritos.</div>`;
                     return;
                 }
             }
 
-            // Aplicar Filtro de Riesgo Global
-            if (currentRisk !== 'Todos') {
-                dataToRender = dataToRender.filter(item => item.risk === currentRisk);
-            }
-
+            if (currentRisk !== 'Todos') dataToRender = dataToRender.filter(item => item.risk === currentRisk);
             sectionTitle.textContent += ` (${dataToRender.length})`;
 
-            dataToRender.forEach(item => {
-                grid.appendChild(createCard(item));
-            });
+            dataToRender.forEach(item => grid.appendChild(createCard(item)));
 
+            // Event Listeners Dinámicos
             document.querySelectorAll('.fav-star').forEach(star => {
                 star.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toggleFavorite(e.currentTarget.dataset.ticker);
+                    toggleStorage(favorites, e.currentTarget.dataset.ticker, 'dashboard_favoritos_v3');
+                    if (currentTab === 'favoritos') renderGrid(currentTab);
+                    else {
+                        const icon = e.currentTarget;
+                        icon.classList.toggle('active');
+                        icon.innerHTML = icon.classList.contains('active') 
+                            ? `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25z" clip-rule="evenodd" />`
+                            : `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25zm0 3.32l-1.614 3.277a.75.75 0 01-.564.41l-3.616.525 2.616 2.55a.75.75 0 01.216.664l-.618 3.601 3.234-1.7a.75.75 0 01.698 0l3.234 1.7-.618-3.601a.75.75 0 01.216-.664l2.616-2.55-3.616-.525a.75.75 0 01-.564-.41L10 5.57z" clip-rule="evenodd" />`;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.btn-add-port').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    toggleStorage(portfolio, e.currentTarget.dataset.ticker, 'dashboard_portfolio_v3');
+                    renderGrid(currentTab);
+                });
+            });
+
+            document.querySelectorAll('.btn-remove-port').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    toggleStorage(portfolio, e.currentTarget.dataset.ticker, 'dashboard_portfolio_v3');
+                    renderGrid(currentTab);
                 });
             });
 
@@ -327,73 +298,39 @@
 
         tabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
-                const target = e.currentTarget.dataset.target;
-                if (currentTab === target) return;
-                currentTab = target;
-                
+                if (currentTab === e.currentTarget.dataset.target) return;
+                currentTab = e.currentTarget.dataset.target;
                 tabs.forEach(t => {
                     t.classList.remove('bg-blue-600', 'text-white', 'shadow-[0_0_12px_rgba(37,99,235,0.4)]', 'border-blue-500');
                     t.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
                 });
-                
                 e.currentTarget.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
                 e.currentTarget.classList.add('bg-blue-600', 'text-white', 'shadow-[0_0_12px_rgba(37,99,235,0.4)]', 'border-blue-500');
-                renderGrid(target);
+                renderGrid(currentTab);
             });
         });
 
-        riskSelect.addEventListener('change', (e) => {
-            currentRisk = e.target.value;
-            renderGrid(currentTab);
-        });
+        riskSelect.addEventListener('change', (e) => { currentRisk = e.target.value; renderGrid(currentTab); });
 
         function openModal(ticker, exchange) {
             modalTitle.innerHTML = `<span class="text-blue-500">${ticker}</span> <span class="text-slate-500 font-medium text-sm ml-2">${exchange}</span>`;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden'; 
-            
+            modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.style.overflow = 'hidden'; 
             modalChartContainer.innerHTML = `<div id="tv_widget_modal" class="w-full h-full"></div>`;
-            
             const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-            script.async = true;
-
-            const config = {
-                "autosize": true,
-                "symbol": `${exchange}:${ticker}`,
-                "interval": "D",
-                "timezone": "America/Argentina/Buenos_Aires",
-                "theme": "dark",
-                "style": "1",
-                "locale": "es",
-                "enable_publishing": false,
-                "backgroundColor": "#090f1a",
-                "gridColor": "#1e293b",
-                "hide_top_toolbar": false,
-                "hide_legend": false,
-                "save_image": false,
-                "container_id": "tv_widget_modal",
-                "support_host": "https://www.tradingview.com",
-                "studies": ["STD;SMA", "STD;RSI"]
-            };
-
-            script.innerHTML = JSON.stringify(config);
+            script.type = 'text/javascript'; script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'; script.async = true;
+            script.innerHTML = JSON.stringify({
+                "autosize": true, "symbol": `${exchange}:${ticker}`, "interval": "D", "timezone": "America/Argentina/Buenos_Aires",
+                "theme": "dark", "style": "1", "locale": "es", "enable_publishing": false, "backgroundColor": "#090f1a",
+                "gridColor": "#1e293b", "hide_top_toolbar": false, "hide_legend": false, "save_image": false,
+                "container_id": "tv_widget_modal", "support_host": "https://www.tradingview.com", "studies": ["STD;SMA", "STD;RSI", "VolumeProfileFixedRange@tv-basicstudies"]
+            });
             document.getElementById('tv_widget_modal').appendChild(script);
         }
 
-        function closeModal() {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = 'auto';
-            modalChartContainer.innerHTML = ''; 
-        }
-
-        closeModalBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
-
+        document.getElementById('close-modal').addEventListener('click', () => {
+            modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = 'auto'; modalChartContainer.innerHTML = ''; 
+        });
+        
         renderGrid('scanners');
     </script>
 </body>
