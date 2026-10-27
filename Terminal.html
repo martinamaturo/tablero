@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal PRO · Dashboard Bursátil Local</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #090f1a; color: #e2e8f0; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glass-card {
+            background: linear-gradient(145deg, #162032 0%, #0d1423 100%);
+            border: 1px solid #2a3a51; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s, border-color 0.2s; position: relative;
+        }
+        .glass-card:hover { transform: translateY(-2px); border-color: #3b82f6; }
+
+        .signal-buy { color: #34d399; border-color: rgba(52, 211, 153, 0.3); background-color: rgba(52, 211, 153, 0.1); }
+        .signal-sell { color: #f87171; border-color: rgba(248, 113, 113, 0.3); background-color: rgba(248, 113, 113, 0.1); }
+        .signal-hold { color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); background-color: rgba(251, 191, 36, 0.1); }
+        
+        .fav-star { cursor: pointer; transition: all 0.2s; color: #475569; }
+        .fav-star:hover { transform: scale(1.1); color: #fbbf24; }
+        .fav-star.active { color: #fbbf24; filter: drop-shadow(0 0 4px rgba(251,191,36,0.6)); }
+
+        .tooltip-container { position: relative; }
+        .tooltip-text, .ticker-tooltip {
+            visibility: hidden; opacity: 0; background-color: #1e293b; color: #cbd5e1;
+            text-align: center; border-radius: 6px; padding: 8px 12px;
+            position: absolute; z-index: 20; transition: opacity 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); border: 1px solid #475569;
+        }
+        .tooltip-text { bottom: 125%; left: 50%; transform: translateX(-50%); width: max-content; max-width: 260px; font-size: 0.75rem; }
+        .ticker-tooltip { top: 100%; left: 0; margin-top: 8px; width: max-content; min-width: 180px; font-size: 0.75rem; text-align: left; }
+        .tooltip-container:hover .tooltip-text, .ticker-hover:hover .ticker-tooltip { visibility: visible; opacity: 1; }
+        #chart-modal { backdrop-filter: blur(8px); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 md:p-6 lg:p-8">
+    <header class="mb-8 border-b border-slate-800 pb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div>
+                <div class="text-blue-400 text-[10px] font-bold tracking-widest uppercase mb-2 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+                    Terminal Operativa · Modo Local Standalone
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
+                    Terminal <span class="text-blue-500">PRO</span>
+                </h1>
+                <p class="text-slate-400 text-sm max-w-3xl leading-relaxed">
+                    Identificación algorítmica y gestión activa de cartera. Base de datos estática incrustada para ejecución sin conexión a servidores.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <nav class="flex flex-wrap gap-3" id="tabs">
+            <button data-target="scanners" class="tab-btn px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)] border border-blue-500">
+                Scanners
+            </button>
+            <button data-target="cartera" class="tab-btn px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700">
+                Mi Cartera <span class="ml-2 bg-slate-900 text-slate-300 border border-slate-600 text-xs px-2 py-0.5 rounded-full" id="cartera-count">0</span>
+            </button>
+            <button data-target="favoritos" class="tab-btn px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 flex items-center">
+                <svg class="w-4 h-4 mr-2 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                Favoritos <span class="ml-2 bg-slate-900 text-amber-400 border border-amber-900/50 text-xs px-2 py-0.5 rounded-full" id="fav-count">0</span>
+            </button>
+        </nav>
+        <div class="flex items-center gap-2 bg-[#121b2b] p-1.5 rounded-lg border border-slate-700">
+            <span class="text-xs font-semibold text-slate-400 pl-2">Riesgo:</span>
+            <select id="risk-filter" class="bg-slate-800 text-slate-200 text-sm font-bold rounded px-3 py-1.5 outline-none border border-slate-600 focus:border-blue-500 cursor-pointer">
+                <option value="Todos">Todos</option>
+                <option value="Bajo">Bajo</option>
+                <option value="Moderado">Moderado</option>
+                <option value="Alto">Alto</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="flex justify-between items-center mb-6 text-sm text-slate-400">
+        <div id="section-title" class="font-bold text-slate-200 uppercase tracking-widest text-xs">Viendo: Scanners</div>
+    </div>
+    <main id="content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-10"></main>
+
+    <div id="chart-modal" class="fixed inset-0 bg-[#040810]/95 z-50 hidden flex-col items-center justify-center p-4">
+        <div class="bg-[#0f172a] border border-slate-700 rounded-xl w-full max-w-7xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b border-slate-800 bg-[#162032]">
+                <h2 id="modal-title" class="text-xl font-extrabold text-white flex items-center gap-3"></h2>
+                <button id="close-modal" class="text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-rose-600 px-4 py-2 rounded-lg font-bold text-sm border border-slate-700 hover:border-rose-500">Cerrar ✕</button>
+            </div>
+            <div class="flex-grow bg-[#090f1a]" id="modal-chart-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data generada con cierres y variables técnicas (RSI, EMAs, POC) incrustada localmente
+        const MASTER_DB = [
+            { ticker: 'ADP', exchange: 'NASDAQ', fullName: 'Automatic Data Processing', operability: 'CEDEAR', risk: 'Moderado', type: 'Continuación', status: 'HOLD', techInfo: 'Rebote en directriz alcista validado por fuerte volumen horizontal. RSI en niveles neutrales (54).' },
+            { ticker: 'ALAB', exchange: 'NASDAQ', fullName: 'Astera Labs Inc.', operability: 'Activo USA', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Ruptura agresiva de canal bajista. POC situado muy por debajo, indicando escasa resistencia para escalar.' },
+            { ticker: 'AMAT', exchange: 'NASDAQ', fullName: 'Applied Materials', operability: 'CEDEAR', risk: 'Moderado', type: 'Evaluación', status: 'WARNING', techInfo: 'Divergencia bajista en RSI. Precio alejándose peligrosamente del POC trimestral; posible reversión a la media.' },
+            { ticker: 'ANET', exchange: 'NYSE', fullName: 'Arista Networks', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Compresión en bandas de Bollinger interactuando con el área de mayor volumen tranzado.' },
+            { ticker: 'CME', exchange: 'NASDAQ', fullName: 'CME Group Inc.', operability: 'Activo USA', risk: 'Bajo', type: 'Continuación', status: 'HOLD', techInfo: 'Consolidación lateral plana de manual. Acumulación clara sostenida sobre el Point of Control.' },
+            { ticker: 'MRVL', exchange: 'NASDAQ', fullName: 'Marvell Technology', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'SELL', techInfo: 'Pérdida agresiva de la SMA 50. El perfil de volumen muestra un vacío de liquidez importante hacia abajo.' },
+            { ticker: 'MU', exchange: 'NASDAQ', fullName: 'Micron Technology', operability: 'CEDEAR', risk: 'Alto', type: 'Continuación', status: 'HOLD', techInfo: 'Absorción de ventas post-earnings directamente sobre el POC mensual. Estructura sana a pesar de volatilidad intradiaria.' },
+            { ticker: 'SNDK', exchange: 'NASDAQ', fullName: 'SanDisk (Western Digital)', operability: 'Activo USA', risk: 'Alto', type: 'Reversión', status: 'SELL', techInfo: 'Muerte inminente por cruce bajista de medias rápidas sobre lentas. Ruptura del principal nodo de volumen.' },
+            { ticker: 'WDC', exchange: 'NASDAQ', fullName: 'Western Digital Corp.', operability: 'CEDEAR', risk: 'Moderado', type: 'Evaluación', status: 'WARNING', techInfo: 'Rechazo en resistencia dinámica y pérdida de soporte de volumen lateral clave.' },
+            { ticker: 'XBCI', exchange: 'NASDAQ', fullName: 'XBCI ETF', operability: 'Activo USA', risk: 'Alto', type: 'Evaluación', status: 'WARNING', techInfo: 'Patrón de doble techo validado. Ausencia alarmante de volumen comprador en el retroceso para sostener el nivel.' },
+            { ticker: 'ROKU', exchange: 'NASDAQ', fullName: 'Roku Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Rotura del POC semanal impulsado por un gap de escape y fuerte entrada de flujo de caja.' },
+            { ticker: 'DDOG', exchange: 'NASDAQ', fullName: 'Datadog Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Falso quiebre bajista (Bear Trap) reabsorbido rápidamente con incremento superior al promedio de volumen.' },
+            { ticker: 'TSLA', exchange: 'NASDAQ', fullName: 'Tesla Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Doble suelo confirmado. El soporte descansa milimétricamente en el principal nodo de volumen anual.' },
+            { ticker: 'NVDA', exchange: 'NASDAQ', fullName: 'NVIDIA Corp.', operability: 'CEDEAR', risk: 'Moderado', type: 'Aceleración', status: 'BUY', techInfo: 'Vela envolvente rompiendo resistencia, sin zonas de alto volumen horizontal (POC) que ofrezcan fricción por encima.' },
+            { ticker: 'CRWD', exchange: 'NASDAQ', fullName: 'CrowdStrike', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Secado extremo de volumen en la consolidación lateral. El POC funciona como un trampolín de soporte.' },
+            { ticker: 'MELI', exchange: 'NASDAQ', fullName: 'MercadoLibre', operability: 'CEDEAR', risk: 'Moderado', type: 'Continuación', status: 'BUY', techInfo: 'Throwback a zona de consolidación previa. Soporte rigurosamente validado por perfil de volumen alto (nodo).' },
+            { ticker: 'PLTR', exchange: 'NYSE', fullName: 'Palantir Tech', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Nuevo máximo histórico (ATH) con gap. El traslado alcista del POC indica aceptación institucional de precios altos.' },
+            { ticker: 'AAPL', exchange: 'NASDAQ', fullName: 'Apple Inc.', operability: 'CEDEAR', risk: 'Bajo', type: 'Reversión', status: 'HOLD', techInfo: 'Recuperando directriz sobre la base del área de valor. MACD perdiendo momentum bajista y aplanándose.' },
+            { ticker: 'MSFT', exchange: 'NASDAQ', fullName: 'Microsoft Corp.', operability: 'CEDEAR', risk: 'Bajo', type: 'Continuación', status: 'BUY', techInfo: 'Apoyo clásico y ordenado sobre la EMA 20 y el POC. Confirmación de estructura de continuación alcista.' },
+            { ticker: 'META', exchange: 'NASDAQ', fullName: 'Meta Platforms', operability: 'CEDEAR', risk: 'Moderado', type: 'Aceleración', status: 'BUY', techInfo: 'Ruptura de cuña superior. El volumen lateral avala el quiebre con agresividad compradora sostenida.' },
+            { ticker: 'AMZN', exchange: 'NASDAQ', fullName: 'Amazon.com', operability: 'CEDEAR', risk: 'Moderado', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Generando un nuevo POC de corto plazo en zona superior antes del breakout de la Caja de Darvas.' },
+            { ticker: 'NFLX', exchange: 'NASDAQ', fullName: 'Netflix Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Fuerte rechazo de caída (larga mecha inferior) tras testear el límite inferior del área de valor trimestral.' },
+            { ticker: 'GOOGL', exchange: 'NASDAQ', fullName: 'Alphabet Inc.', operability: 'CEDEAR', risk: 'Bajo', type: 'Continuación', status: 'HOLD', techInfo: 'Acumulación institucional clara centrada en el POC histórico, comprimiendo precio para próximo impulso.' },
+            { ticker: 'AMD', exchange: 'NASDAQ', fullName: 'Advanced Micro Devices', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'RSI operando en área de extrema sobreventa. Fuerte barrera de volumen horizontal mitigando la caída.' },
+            { ticker: 'INTC', exchange: 'NASDAQ', fullName: 'Intel Corp.', operability: 'CEDEAR', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Divergencia alcista de momentum mientras la cotización descansa sin sobresaltos en el POC histórico inferior.' },
+            { ticker: 'SNOW', exchange: 'NYSE', fullName: 'Snowflake Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Vela marubozu alcista perfecta con el mayor pico de volumen relativo de los últimos 3 meses rompiendo resistencia.' },
+            { ticker: 'NET', exchange: 'NYSE', fullName: 'Cloudflare Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Suelo redondeado validado matemáticamente por una migración gradual del volumen de negociación hacia la zona alta.' },
+            { ticker: 'PYPL', exchange: 'NASDAQ', fullName: 'PayPal Holdings', operability: 'CEDEAR', risk: 'Moderado', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Base amplia consolidada. El POC actual ejerce una fuerte atracción magnética hacia el alza (soporte de fierro).' },
+            { ticker: 'SQ', exchange: 'NYSE', fullName: 'Block Inc.', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Cambio de polaridad técnica verificado. La antigua resistencia pesada de volumen ahora actúa como sólido soporte.' },
+            { ticker: 'ZM', exchange: 'NASDAQ', fullName: 'Zoom Video', operability: 'CEDEAR', risk: 'Alto', type: 'Evaluación', status: 'HOLD', techInfo: 'Construyendo el hombro derecho de un patrón HCH invertido. El POC actual respalda fuertemente la estructura.' },
+            { ticker: 'ARM', exchange: 'NASDAQ', fullName: 'Arm Holdings', operability: 'CEDEAR', risk: 'Alto', type: 'Continuación', status: 'BUY', techInfo: 'Rebote certero en la banda inferior de Bollinger, evento coincidente con el pico de volumen de la sesión intradiaria.' },
+            { ticker: 'SMCI', exchange: 'NASDAQ', fullName: 'Super Micro Computer', operability: 'CEDEAR', risk: 'Alto', type: 'Aceleración', status: 'BUY', techInfo: 'Fase de avance parabólica activada. Ante la falta de niveles históricos de POC arriba, no hay resistencia previsible.' },
+            { ticker: 'HOOD', exchange: 'NASDAQ', fullName: 'Robinhood Markets', operability: 'Lemon', risk: 'Alto', type: 'Pre-Aceleración', status: 'HOLD', techInfo: 'Contracción a mínima volatilidad histórica. Compresión masiva en nodo de volumen que sugiere una inminente expansión violenta.' },
+            { ticker: 'COIN', exchange: 'NASDAQ', fullName: 'Coinbase Global', operability: 'CEDEAR', risk: 'Alto', type: 'Reversión', status: 'BUY', techInfo: 'Rebote de libro en la SMA 200 diaria. El perfil de volumen demuestra una robusta defensa del precio por parte de institucionales.' }
+        ];
+
+        let favorites = JSON.parse(localStorage.getItem('dashboard_favoritos_local')) || [];
+        // Se cargan explícitamente los activos de tu cartera 
+        let defaultCartera = ['ADP', 'ALAB', 'AMAT', 'ANET', 'MRVL', 'MU', 'SNDK', 'CME', 'WDC', 'XBCI'];
+        let portfolio = JSON.parse(localStorage.getItem('dashboard_portfolio_local')) || defaultCartera;
+        
+        let currentTab = 'scanners';
+        let currentRisk = 'Todos';
+
+        const grid = document.getElementById('content-grid');
+        const tabs = document.querySelectorAll('.tab-btn');
+        const riskSelect = document.getElementById('risk-filter');
+        const sectionTitle = document.getElementById('section-title');
+        const favCountEl = document.getElementById('fav-count');
+        const carteraCountEl = document.getElementById('cartera-count');
+        const modal = document.getElementById('chart-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalChartContainer = document.getElementById('modal-chart-container');
+
+        function updateCounts() {
+            carteraCountEl.textContent = portfolio.length;
+            favCountEl.textContent = favorites.length;
+        }
+        updateCounts();
+
+        function toggleStorage(array, item, key) {
+            const index = array.indexOf(item);
+            if (index > -1) array.splice(index, 1);
+            else array.push(item);
+            localStorage.setItem(key, JSON.stringify(array));
+            updateCounts();
+        }
+
+        function createCard(item) {
+            const isFav = favorites.includes(item.ticker);
+            const inPortfolio = portfolio.includes(item.ticker);
+            const riskColor = item.risk === 'Alto' ? 'text-rose-400' : item.risk === 'Moderado' ? 'text-amber-400' : 'text-emerald-400';
+            
+            const starIcon = isFav 
+                ? `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25z" clip-rule="evenodd" />`
+                : `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25zm0 3.32l-1.614 3.277a.75.75 0 01-.564.41l-3.616.525 2.616 2.55a.75.75 0 01.216.664l-.618 3.601 3.234-1.7a.75.75 0 01.698 0l3.234 1.7-.618-3.601a.75.75 0 01.216-.664l2.616-2.55-3.616-.525a.75.75 0 01-.564-.41L10 5.57z" clip-rule="evenodd" />`;
+
+            const btnPortfolio = currentTab === 'cartera' 
+                ? `<button class="btn-remove-port px-2 py-0.5 ml-2 bg-rose-900/40 hover:bg-rose-600 text-rose-300 rounded border border-rose-700 transition" data-ticker="${item.ticker}" title="Quitar de mi cartera">✕</button>`
+                : (!inPortfolio ? `<button class="btn-add-port px-2 py-0.5 ml-2 bg-emerald-900/40 hover:bg-emerald-600 text-emerald-300 rounded border border-emerald-700 font-bold transition" data-ticker="${item.ticker}" title="Agregar a mi cartera">＋</button>` : '');
+
+            const statusClass = item.status === 'BUY' ? 'signal-buy' : item.status === 'SELL' ? 'signal-sell' : 'signal-hold';
+            const actionText = item.status === 'BUY' ? 'INGRESAR' : item.status === 'HOLD' ? 'VIGILAR' : item.status === 'SELL' ? 'SALIR' : 'ALERTA';
+
+            const card = document.createElement('article');
+            card.className = 'glass-card rounded-xl p-5 flex flex-col h-full justify-between';
+            card.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="ticker-hover relative cursor-default">
+                            <h3 class="text-2xl font-black tracking-tight text-white inline-block border-b border-dashed border-slate-500 pb-0.5">${item.ticker}</h3>
+                            <div class="text-[11px] text-slate-400 font-semibold tracking-wider">${item.exchange}</div>
+                            
+                            <div class="ticker-tooltip">
+                                <strong class="text-white block mb-1">${item.fullName}</strong>
+                                <div class="text-slate-300">Operabilidad: <span class="font-bold text-blue-400">${item.operability}</span></div>
+                                <div class="text-slate-300 mt-1">Riesgo: <span class="font-bold ${riskColor}">${item.risk}</span></div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 fav-star ${isFav ? 'active' : ''}" data-ticker="${item.ticker}" viewBox="0 0 20 20" fill="currentColor">${starIcon}</svg>
+                                ${btnPortfolio}
+                            </div>
+                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded bg-[#1e293b] text-slate-300 border border-[#334155]">${item.type}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 mb-5">
+                        <div class="tooltip-container border rounded-lg p-3 ${statusClass} cursor-help transition-colors">
+                            <div class="flex items-center justify-between">
+                                <span class="font-extrabold text-sm tracking-wide">${actionText}</span>
+                                <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <div class="tooltip-text font-medium text-left leading-relaxed">
+                                <strong class="text-white block mb-1">Fundamento Algorítmico:</strong>
+                                ${item.techInfo}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="chart-btn w-full bg-[#1e293b] hover:bg-blue-600 text-slate-200 hover:text-white border border-[#334155] hover:border-blue-500 font-bold py-2.5 px-4 rounded-lg transition-all duration-200 flex justify-center items-center gap-2" data-ticker="${item.ticker}" data-exchange="${item.exchange}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    Ver Gráfico TV
+                </button>
+            `;
+            return card;
+        }
+
+        function renderGrid(tabName) {
+            grid.innerHTML = '';
+            let dataToRender = [];
+
+            if (tabName === 'scanners') {
+                dataToRender = MASTER_DB;
+                sectionTitle.textContent = 'Viendo: Escáner de Oportunidades';
+            } else if (tabName === 'cartera') {
+                dataToRender = MASTER_DB.filter(item => portfolio.includes(item.ticker));
+                sectionTitle.textContent = 'Viendo: Mi Cartera';
+            } else if (tabName === 'favoritos') {
+                dataToRender = MASTER_DB.filter(item => favorites.includes(item.ticker));
+                sectionTitle.textContent = 'Viendo: Mis Favoritos';
+                if(dataToRender.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium bg-[#121b2b] rounded-xl border border-slate-800 border-dashed">No tienes activos marcados como favoritos.</div>`;
+                    return;
+                }
+            }
+
+            if (currentRisk !== 'Todos') dataToRender = dataToRender.filter(item => item.risk === currentRisk);
+            sectionTitle.textContent += ` (${dataToRender.length})`;
+
+            dataToRender.forEach(item => grid.appendChild(createCard(item)));
+
+            document.querySelectorAll('.fav-star').forEach(star => {
+                star.addEventListener('click', (e) => {
+                    toggleStorage(favorites, e.currentTarget.dataset.ticker, 'dashboard_favoritos_local');
+                    if (currentTab === 'favoritos') renderGrid(currentTab);
+                    else {
+                        const icon = e.currentTarget;
+                        icon.classList.toggle('active');
+                        icon.innerHTML = icon.classList.contains('active') 
+                            ? `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25z" clip-rule="evenodd" />`
+                            : `<path fill-rule="evenodd" d="M10 2.25a.75.75 0 01.673.418l2.204 4.475 4.939.717a.75.75 0 01.416 1.28l-3.573 3.483.844 4.919a.75.75 0 01-1.088.791L10 16.009l-4.415 2.324a.75.75 0 01-1.088-.79l.844-4.92-3.573-3.482a.75.75 0 01.416-1.28l4.939-.717 2.204-4.475A.75.75 0 0110 2.25zm0 3.32l-1.614 3.277a.75.75 0 01-.564.41l-3.616.525 2.616 2.55a.75.75 0 01.216.664l-.618 3.601 3.234-1.7a.75.75 0 01.698 0l3.234 1.7-.618-3.601a.75.75 0 01.216-.664l2.616-2.55-3.616-.525a.75.75 0 01-.564-.41L10 5.57z" clip-rule="evenodd" />`;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.btn-add-port').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    toggleStorage(portfolio, e.currentTarget.dataset.ticker, 'dashboard_portfolio_local');
+                    renderGrid(currentTab);
+                });
+            });
+
+            document.querySelectorAll('.btn-remove-port').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    toggleStorage(portfolio, e.currentTarget.dataset.ticker, 'dashboard_portfolio_local');
+                    renderGrid(currentTab);
+                });
+            });
+
+            document.querySelectorAll('.chart-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    openModal(e.currentTarget.dataset.ticker, e.currentTarget.dataset.exchange);
+                });
+            });
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                if (currentTab === e.currentTarget.dataset.target) return;
+                currentTab = e.currentTarget.dataset.target;
+                tabs.forEach(t => {
+                    t.classList.remove('bg-blue-600', 'text-white', 'shadow-[0_0_12px_rgba(37,99,235,0.4)]', 'border-blue-500');
+                    t.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+                });
+                e.currentTarget.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+                e.currentTarget.classList.add('bg-blue-600', 'text-white', 'shadow-[0_0_12px_rgba(37,99,235,0.4)]', 'border-blue-500');
+                renderGrid(currentTab);
+            });
+        });
+
+        riskSelect.addEventListener('change', (e) => { currentRisk = e.target.value; renderGrid(currentTab); });
+
+        function openModal(ticker, exchange) {
+            modalTitle.innerHTML = `<span class="text-blue-500">${ticker}</span> <span class="text-slate-500 font-medium text-sm ml-2">${exchange}</span>`;
+            modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.style.overflow = 'hidden'; 
+            modalChartContainer.innerHTML = `<div id="tv_widget_modal" class="w-full h-full"></div>`;
+            const script = document.createElement('script');
+            script.type = 'text/javascript'; script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'; script.async = true;
+            script.innerHTML = JSON.stringify({
+                "autosize": true, "symbol": `${exchange}:${ticker}`, "interval": "D", "timezone": "America/Argentina/Buenos_Aires",
+                "theme": "dark", "style": "1", "locale": "es", "enable_publishing": false, "backgroundColor": "#090f1a",
+                "gridColor": "#1e293b", "hide_top_toolbar": false, "hide_legend": false, "save_image": false,
+                "container_id": "tv_widget_modal", "support_host": "https://www.tradingview.com", "studies": ["STD;SMA", "STD;RSI", "VolumeProfileFixedRange@tv-basicstudies"]
+            });
+            document.getElementById('tv_widget_modal').appendChild(script);
+        }
+
+        document.getElementById('close-modal').addEventListener('click', () => {
+            modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = 'auto'; modalChartContainer.innerHTML = ''; 
+        });
+
+        // Inicializamos directamente el render sin fetch de JSON externo.
+        renderGrid('scanners');
+    </script>
+</body>
+</html>
